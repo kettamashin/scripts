@@ -133,13 +133,6 @@ class MoviePlayerMachine(object):
         # Move file to Trashbox.
         send2trash(self._file)
 
-        # Show empty space of disks.
-        disc_list = glob.glob("/Volumes/*")
-        for path in disc_list:
-            print(path)
-            print("  {:.1f} GB free"
-                  .format(psutil.disk_usage(path).free/1024/1024/1024))
-
     def move_movie(self):
         # Force to move file to destination.
         cwd = os.getcwd() + "/"
