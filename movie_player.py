@@ -41,8 +41,8 @@ class HistoryManager(object):
     def played(self, file):
         self._history_data[file][0] += 1
 
-    def finished(self, file):
-        if file in self._history_data.keys():
+    def finished(self, file, log_finished=True):
+        if file in self._history_data.keys() and log_finished:
             self._history_data[file][1] += 1
         with open(self.CSV_NAME, 'w') as f:
             csv_file = csv.DictWriter(f, fieldnames=self.FIELD_NAMES)
@@ -105,6 +105,7 @@ class MoviePlayerMachine(object):
         self._history_manager = HistoryManager()
         self._file = ''
 
+    # Pick up next file name from play list.
     def next_file(self):
         # raise exception if file list becomes empty.
         if(len(self._play_list) == 0):
@@ -113,6 +114,11 @@ class MoviePlayerMachine(object):
             raise EmptyListException
         # Choose file from play list.
         self._file = self._play_list.pop()
+
+        # Print all files in play list.
+        print('')
+        for file_after_next in self._play_list:
+            print(file_after_next.replace('./', ''))
         print('\n('+str(self._num_files-len(self._play_list)) +
               '/'+str(self._num_files)+')')
         print(self._file.replace('./', ''))
@@ -142,7 +148,10 @@ class MoviePlayerMachine(object):
                     dst.resolve())
 
     def quit(self):
-        self._history_manager.finished(self._file)
+        self._history_manager.finished(self._file, log_finished=False)
+
+    def finish(self):
+        self._history_manager.finished(self._file, log_finished=True)
 
 
 if __name__ == '__main__':
@@ -163,7 +172,7 @@ if __name__ == '__main__':
         machine.start()
         while True:
             if machine.state == 'WAIT':
-                print('q:exit  /:play  \':skip')
+                print('q:quit  /:play  \':skip')
                 while True:
                     key = getch()
                     if(key == '\''):
@@ -173,9 +182,10 @@ if __name__ == '__main__':
                         machine.play()
                         break
                     elif(key == 'q'):
+                        machine.quit()
                         exit()
             if machine.state == 'PLAYED':
-                print('q:exit  /:next  m:move  k:delete  p:replay')
+                print('q:quit  /:next  m:move  k:delete  p:replay  f:finish')
                 while True:
                     key = getch()
                     if(key == '/'):
@@ -191,6 +201,10 @@ if __name__ == '__main__':
                         machine.move()
                         break
                     elif(key == 'q'):
+                        machine.quit()
+                        exit()
+                    elif(key == 'f'):
+                        machine.finish()
                         exit()
     except EmptyListException:
         pass
@@ -198,5 +212,4 @@ if __name__ == '__main__':
         import traceback
         traceback.print_exc()
     finally:
-        machine.quit()
         print('finish')
