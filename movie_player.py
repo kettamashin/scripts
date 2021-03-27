@@ -43,6 +43,7 @@ class HistoryManager(object):
 
     def finished(self, file, log_finished=True):
         if file in self._history_data.keys() and log_finished:
+            self._history_data[file][0] -= 1
             self._history_data[file][1] += 1
         with open(self.CSV_NAME, 'w') as f:
             csv_file = csv.DictWriter(f, fieldnames=self.FIELD_NAMES)
