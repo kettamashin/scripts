@@ -48,11 +48,11 @@ class HistoryManager(object):
         with open(self.CSV_NAME, 'w') as f:
             csv_file = csv.DictWriter(f, fieldnames=self.FIELD_NAMES)
             csv_file.writeheader()
-            for file in self._history_data.keys():
+            for key in self._history_data.keys():
                 csv_file.writerow(
-                    {self.FIELD_NAMES[0]: file,
-                     self.FIELD_NAMES[1]: self._history_data[file][0],
-                     self.FIELD_NAMES[2]: self._history_data[file][1]})
+                    {self.FIELD_NAMES[0]: key,
+                     self.FIELD_NAMES[1]: self._history_data[key][0],
+                     self.FIELD_NAMES[2]: self._history_data[key][1]})
             print(self.CSV_NAME + ' closed')
 
     def play_list(self, files_in_current):
@@ -112,6 +112,7 @@ class MoviePlayerMachine(object):
         if(len(self._play_list) == 0):
             print('play list is empty.')
             self._file = ''
+            self._history_manager.finished(self._file, log_finished=False)
             raise EmptyListException
         # Choose file from play list.
         self._file = self._play_list.pop()
