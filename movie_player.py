@@ -18,7 +18,7 @@ class EmptyListException(Exception):
 
 
 class HistoryManager(object):
-    FIELD_NAMES = ['file', 'num_played', 'num_finished']
+    FIELD_NAMES = ['file', 'is_played', 'num_finished']
     CSV_NAME = './.history.csv'
 
     def __init__(self):
@@ -39,12 +39,19 @@ class HistoryManager(object):
                     int(row[self.FIELD_NAMES[2]])]
 
     def played(self, file):
-        self._history_data[file][0] += 1
+        self._history_data[file][0] = 1
 
     def finished(self, file, log_finished=True):
         if file in self._history_data.keys() and log_finished:
-            self._history_data[file][0] -= 1
+            self._history_data[file][0] = 0
             self._history_data[file][1] += 1
+        all_played = True
+        for value in self._history_data.values():
+            if value[0] == 0:
+                all_played = False
+        if all_played:
+            for key in self._history_data.keys():
+                self._history_data[key][0] = 0
         with open(self.CSV_NAME, 'w') as f:
             csv_file = csv.DictWriter(f, fieldnames=self.FIELD_NAMES)
             csv_file.writeheader()
@@ -67,14 +74,9 @@ class HistoryManager(object):
                 deleted_files.append(file)
         for file in deleted_files:
             self._history_data.pop(file)
-        # Get list of files which have min played number.
-        min = sys.maxsize
-        for nums in self._history_data.values():
-            if min > nums[0]:  # num of played
-                min = nums[0]
         play_list = []
         for file in self._history_data.keys():
-            if self._history_data[file][0] == min:
+            if self._history_data[file][0] == 0:
                 play_list.append(file)
         random.shuffle(play_list)
         return play_list
