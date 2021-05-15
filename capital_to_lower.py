@@ -13,10 +13,10 @@ if __name__ == "__main__":
         new_name = file_name.replace(file_name, file_name.lower())
         if (new_name == file_name):
             continue
-        print("Rename from [" + file_name + "]\n"
-              + "         to [" + new_name + "]?  y/n")
+        print("\nRename from [" + file_name + "]\n"
+              + "         to [" + new_name + "]?  y/else")
         key = getch()
         if key == 'y':
             os.rename(file_name, new_name)
-        elif key == 'n':
+        else:
             print("skip rename [" + file_name + "]")
