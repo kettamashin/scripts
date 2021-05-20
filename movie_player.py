@@ -45,13 +45,20 @@ class HistoryManager(object):
         if file in self._history_data.keys() and log_finished:
             self._history_data[file][0] = 0
             self._history_data[file][1] += 1
+        new_file_exists = False
+        files_in_current = glob.glob("./*")
+        for file in files_in_current:
+            if file not in self._initial_files:
+                new_file_exists = True
+                break
         all_played = True
-        for value in self._history_data.values():
-            if value[0] == 0:
-                all_played = False
-        if all_played:
-            for key in self._history_data.keys():
-                self._history_data[key][0] = 0
+        if not new_file_exists:
+            for value in self._history_data.values():
+                if value[0] == 0:
+                    all_played = False
+            if all_played:
+                for key in self._history_data.keys():
+                    self._history_data[key][0] = 0
         with open(self.CSV_NAME, 'w') as f:
             csv_file = csv.DictWriter(f, fieldnames=self.FIELD_NAMES)
             csv_file.writeheader()
@@ -63,6 +70,7 @@ class HistoryManager(object):
             print(self.CSV_NAME + ' closed')
 
     def play_list(self, files_in_current):
+        self._initial_files = files_in_current
         # Add new files to history.
         for file in files_in_current:
             if file not in self._history_data.keys():
