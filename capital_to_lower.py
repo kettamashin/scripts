@@ -5,11 +5,17 @@ import glob
 import shutil
 from getch import Getch
 
+ignore_list = ['.part', '.rar']
+
 if __name__ == "__main__":
     file_list = glob.glob("./*")
     getch = Getch()
     for file in file_list:
         file_name = file.replace("./", "")
+        _, ext = os.path.splitext(file_name)
+        print(ext)
+        if ext in ignore_list:
+            continue
         new_name = file_name.replace(file_name, file_name.lower())
         if (new_name == file_name):
             continue
