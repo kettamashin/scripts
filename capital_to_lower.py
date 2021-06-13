@@ -13,7 +13,6 @@ if __name__ == "__main__":
     for file in file_list:
         file_name = file.replace("./", "")
         _, ext = os.path.splitext(file_name)
-        print(ext)
         if ext in ignore_list:
             continue
         new_name = file_name.replace(file_name, file_name.lower())
