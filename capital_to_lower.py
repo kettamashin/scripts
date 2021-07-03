@@ -12,9 +12,12 @@ if __name__ == "__main__":
     getch = Getch()
     for file in file_list:
         file_name = file.replace("./", "")
+
+        # Ignore files which have extension in the list.
         _, ext = os.path.splitext(file_name)
         if ext in ignore_list:
             continue
+
         new_name = file_name.replace(file_name, file_name.lower())
         if (new_name == file_name):
             continue
