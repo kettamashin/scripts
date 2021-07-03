@@ -131,7 +131,8 @@ class MoviePlayerMachine(object):
         print('')
         for file_after_next in self._play_list:
             print(file_after_next.replace('./', ''))
-        print('\n('+str(self._num_files-len(self._play_list)) +
+        print('-----------------------------------')
+        print('('+str(self._num_files-len(self._play_list)) +
               '/'+str(self._num_files)+')')
         print(self._file.replace('./', ''))
 
