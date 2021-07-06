@@ -10,6 +10,8 @@ ignore_list = ['.part', '.rar']
 if __name__ == "__main__":
     file_list = glob.glob("./*")
     getch = Getch()
+    is_all = False
+    num_files = 0
     for file in file_list:
         file_name = file.replace("./", "")
 
@@ -21,10 +23,22 @@ if __name__ == "__main__":
         new_name = file_name.replace(file_name, file_name.lower())
         if (new_name == file_name):
             continue
+
+        num_files += 1
+
+        if is_all:
+            os.rename(file_name, new_name)
+            continue
+
         print("\nRename from [" + file_name + "]\n"
-              + "         to [" + new_name + "]?  y/else")
+              + "         to [" + new_name + "]?  y:yes  n:no  !:yes all")
         key = getch()
         if key == 'y':
             os.rename(file_name, new_name)
-        else:
+        elif key == 'n':
             print("skip rename [" + file_name + "]")
+        elif key == '!':
+            os.rename(file_name, new_name)
+            is_all = True
+
+    print(str(num_files) + ' files are modified.')
