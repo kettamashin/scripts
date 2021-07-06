@@ -34,9 +34,13 @@ if __name__ == "__main__":
         if (new_name == file_name):
             continue
         print("\nRename from [" + file_name + "]\n"
-              + "         to [" + new_name + "]?  y/else")
-        key = getch()
-        if key == 'y':
-            os.rename(file_name, new_name)
-        else:
-            print("skip rename [" + file_name + "]")
+              + "         to [" + new_name + "]?  y:yes  n:no")
+
+        while True:
+            key = getch()
+            if key == 'y':
+                os.rename(file_name, new_name)
+                break
+            elif key == 'n':
+                print("skip rename [" + file_name + "]")
+                break
