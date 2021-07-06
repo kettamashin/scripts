@@ -32,13 +32,17 @@ if __name__ == "__main__":
 
         print("\nRename from [" + file_name + "]\n"
               + "         to [" + new_name + "]?  y:yes  n:no  !:yes all")
-        key = getch()
-        if key == 'y':
-            os.rename(file_name, new_name)
-        elif key == 'n':
-            print("skip rename [" + file_name + "]")
-        elif key == '!':
-            os.rename(file_name, new_name)
-            is_all = True
+        while True:
+            key = getch()
+            if key == 'y':
+                os.rename(file_name, new_name)
+                break
+            elif key == 'n':
+                print("skip rename [" + file_name + "]")
+                break
+            elif key == '!':
+                os.rename(file_name, new_name)
+                is_all = True
+                break
 
     print(str(num_files) + ' files are modified.')
