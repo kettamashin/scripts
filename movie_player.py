@@ -157,8 +157,12 @@ class MoviePlayerMachine(object):
         cwd = os.getcwd() + "/"
         dst = pathlib.Path(self._mv_path)
         print('move to ' + str(dst.resolve()))
-        shutil.move(os.path.join(cwd, self._file),
-                    dst.resolve())
+        try:
+            shutil.move(os.path.join(cwd, self._file),
+                        dst.resolve())
+        except:
+            print(
+                '\n[WARNING] The same name file already exists in the target path. Do nothing.')
 
     def quit(self):
         self._history_manager.finished(self._file, log_finished=False)
