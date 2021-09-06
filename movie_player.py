@@ -93,7 +93,7 @@ class HistoryManager(object):
 class MoviePlayerMachine(object):
     states = ['INIT', 'WAIT', 'PLAYED']
 
-    def __init__(self, name, mv_path):
+    def __init__(self, name, mv_path, ignore_list):
         self._name = name
         self._machine = Machine(
             model=self, states=MoviePlayerMachine.states, initial='INIT', auto_transitions=False)
@@ -116,6 +116,8 @@ class MoviePlayerMachine(object):
         self._history_manager = HistoryManager()
         self._file = ''
 
+        self._ignore_list = ignore_list
+
     # Pick up next file name from play list.
     def next_file(self):
         # raise exception if file list becomes empty.
@@ -131,7 +133,7 @@ class MoviePlayerMachine(object):
         print('')
         for file_after_next in self._play_list:
             print(file_after_next.replace('./', ''))
-        print('-----------------------------------')
+        print('--------------------------------------\n')
         print('('+str(self._num_files-len(self._play_list)) +
               '/'+str(self._num_files)+')')
         print(self._file.replace('./', ''))
@@ -139,6 +141,11 @@ class MoviePlayerMachine(object):
     def make_list(self):
         # Make list of files that are in current.
         files_in_current = glob.glob("./*")
+        for file in files_in_current[:]:
+            _, ext = os.path.splitext(file)
+            if ext in self._ignore_list:
+                files_in_current.remove(file)
+                continue
         self._play_list = self._history_manager.play_list(files_in_current)
         self._num_files = len(self._play_list)
 
@@ -182,7 +189,9 @@ if __name__ == '__main__':
             exit()
     else:
         print('usage: python3 movie_player.py (path to move dir)')
-    machine = MoviePlayerMachine('movie_player_machine', mv_path)
+
+    ignore_list = ['.part', '.rar']
+    machine = MoviePlayerMachine('movie_player_machine', mv_path, ignore_list)
     getch = Getch()
 
     try:
