@@ -17,14 +17,14 @@ for file in file_list:
     size = os.path.getsize(file)
 
     if size == pre_size:
+        print('-----------------------')
         print('['+pre_file+']')
         print('['+file+']')
-        print('    are same size files (' + str(size/1000000) + 'MB)\n')
-
-        print('/:open')
-        print('\':skip')
-        print('k:delete [' + pre_file + ']')
-        print('l:delete [' + file + ']')
+        print('    are same size files (' + str(size/1000000) + 'MB)')
+        print('  /:open')
+        print('  \':skip')
+        print('  k:delete [' + pre_file + ']')
+        print('  l:delete [' + file + ']')
         while True:
             key = getch()
             if(key == '/'):
