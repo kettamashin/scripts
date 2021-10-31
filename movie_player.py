@@ -21,7 +21,7 @@ class HistoryManager(object):
     FIELD_NAMES = ['file', 'is_played', 'num_finished']
     CSV_NAME = './.history.csv'
 
-    def __init__(self):
+    def __init__(self, favorite_mode):
         self._history_data = {}
         # If history file doesn't exist, create it.
         if not os.path.isfile(self.CSV_NAME):
@@ -38,13 +38,19 @@ class HistoryManager(object):
                     int(row[self.FIELD_NAMES[1]]),
                     int(row[self.FIELD_NAMES[2]])]
 
+        self._favorite_mode = favorite_mode
+
     def played(self, file):
-        self._history_data[file][0] = 1
+        if not self._favorite_mode:
+            self._history_data[file][0] = 1
 
     def finished(self, file, log_finished=True):
         if file in self._history_data.keys() and log_finished:
             self._history_data[file][0] = 0
-            self._history_data[file][1] += 1
+            if self._favorite_mode:
+                self._history_data[file][1] -= 1
+            else:
+                self._history_data[file][1] += 1
         new_file_exists = False
         files_in_current = glob.glob("./*")
         for file in files_in_current:
@@ -84,7 +90,10 @@ class HistoryManager(object):
             self._history_data.pop(file)
         play_list = []
         for file in self._history_data.keys():
-            if self._history_data[file][0] == 0:
+            if self._favorite_mode:
+                if self._history_data[file][1] > 0:
+                    play_list.append(file)
+            elif self._history_data[file][0] == 0:
                 play_list.append(file)
         random.shuffle(play_list)
         return play_list
@@ -93,7 +102,7 @@ class HistoryManager(object):
 class MoviePlayerMachine(object):
     states = ['INIT', 'WAIT', 'PLAYED']
 
-    def __init__(self, name, mv_path, ignore_list):
+    def __init__(self, name, mv_path, ignore_list, favorite_mode):
         self._name = name
         self._machine = Machine(
             model=self, states=MoviePlayerMachine.states, initial='INIT', auto_transitions=False)
@@ -113,7 +122,7 @@ class MoviePlayerMachine(object):
             trigger='nothing', source='PLAYED', dest='WAIT', after='next_file')
         self._mv_path = mv_path
 
-        self._history_manager = HistoryManager()
+        self._history_manager = HistoryManager(favorite_mode)
         self._file = ''
 
         self._ignore_list = ignore_list
@@ -150,7 +159,7 @@ class MoviePlayerMachine(object):
         self._num_files = len(self._play_list)
 
     def play_movie(self):
-        subprocess.call(["open",
+        subprocess.call(["nice", "-n", "10", "open",
                          "/Applications/VLC.app",
                          self._file])
         self._history_manager.played(self._file)
@@ -179,9 +188,11 @@ class MoviePlayerMachine(object):
 
 
 if __name__ == '__main__':
+    favorite_mode = False
     if len(sys.argv) == 1:
-        print("no path input. use current dir as mv's destination.")
+        print("no path input. Favorite mode.")
         mv_path = "./"
+        favorite_mode = True
     elif len(sys.argv) == 2:
         mv_path = sys.argv[1]
         if not os.path.exists(mv_path):
@@ -191,14 +202,18 @@ if __name__ == '__main__':
         print('usage: python3 movie_player.py (path to move dir)')
 
     ignore_list = ['.part', '.rar']
-    machine = MoviePlayerMachine('movie_player_machine', mv_path, ignore_list)
+    machine = MoviePlayerMachine(
+        'movie_player_machine', mv_path, ignore_list, favorite_mode)
     getch = Getch()
 
     try:
         machine.start()
         while True:
             if machine.state == 'WAIT':
-                print('q:quit  /:play  \':skip')
+                if favorite_mode:
+                    print('[favorite mode] q:quit  /:play  \':skip')
+                else:
+                    print('q:quit  /:play  \':skip')
                 while True:
                     key = getch()
                     if(key == '\''):
@@ -211,7 +226,11 @@ if __name__ == '__main__':
                         machine.quit()
                         exit()
             if machine.state == 'PLAYED':
-                print('q:quit  /:next  m:move  k:delete  p:replay  f:finish')
+                if favorite_mode:
+                    print(
+                        '[favorite mode] q:quit  /:next  m:move  k:delete  p:replay  f:unfavorite')
+                else:
+                    print('q:quit  /:next  m:move  k:delete  p:replay  f:favorite')
                 while True:
                     key = getch()
                     if(key == '/'):
