@@ -44,6 +44,7 @@ for file in sorted_files:
         print('  \':skip')
         print('  k:delete [' + pre_file + ']')
         print('  l:delete [' + file + ']')
+        print('  q:quit')
         while True:
             key = getch()
             if(key == '/'):
@@ -57,6 +58,8 @@ for file in sorted_files:
             elif(key == 'l'):
                 send2trash(file)
                 break
+            elif(key == 'q'):
+                exit()
 
     pre_file = file
     pre_size = size
