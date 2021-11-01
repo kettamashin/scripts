@@ -3,7 +3,6 @@
 import glob
 import subprocess
 import os
-import random
 import subprocess
 import sys
 from getch import Getch
