@@ -5,15 +5,34 @@ import subprocess
 import os
 import random
 import subprocess
+import sys
 from getch import Getch
 from send2trash import send2trash
 
 getch = Getch()
-file_list = sorted(glob.glob("./*"), key=os.path.getsize)
+
+if len(sys.argv) == 1:
+    print('\nHow to use:')
+    print('  find_same_size_file.py [dir1] [dir2] ...\n')
+    exit()
+
+paths = sys.argv[1:]
+
+for path in paths:
+    if not os.path.exists(path):
+        print(path + ' does not exist.')
+        exit()
+
+files = []
+for path in paths:
+    files += glob.glob(path + '/*')
+
+sorted_files = sorted(files, key=os.path.getsize)
+
 pre_file = ''
 pre_size = ''
 
-for file in file_list:
+for file in sorted_files:
     size = os.path.getsize(file)
 
     if size == pre_size:
