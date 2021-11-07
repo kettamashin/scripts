@@ -51,15 +51,19 @@ for file in files:
         while True:
             key = getch()
             if(key == '/'):
+                print('play movies')
                 subprocess.call(
                     ["open", "/Applications/VLC.app", ref_file, file])
             elif(key == '\''):
+                print('skip')
                 break
             elif(key == 'k'):
+                print('delete ' + file)
                 send2trash(file)
                 deleted_files.append(os.path.basename(file))
                 break
             elif(key == 'l'):
+                print('delete ' + ref_file)
                 send2trash(ref_file)
                 deleted_files.append(os.path.basename(ref_file))
                 break
