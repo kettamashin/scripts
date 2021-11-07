@@ -21,51 +21,56 @@ for path in paths:
         print(path + ' does not exist.')
         exit()
 
-files = []
+files1 = []
 for path in paths:
-    files += glob.glob(path + '/*')
+    files1 += glob.glob(path + '/*')
 
-ref_files = files[:]
+files2 = files1[:]
 deleted_files = []
 
-for file in files:
-    for ref_file in ref_files:
-        if file == ref_file:
+for file1 in files1:
+    for file2 in files2:
+        if file1 == file2:
             continue
-        if os.path.basename(file) != os.path.basename(ref_file):
+        if os.path.basename(file1) != os.path.basename(file2):
             continue
-        if os.path.basename(file) in deleted_files:
+        if os.path.basename(file1) in deleted_files:
             continue
-        if os.path.basename(ref_file) in deleted_files:
+        if os.path.basename(file2) in deleted_files:
             continue
         print('-----------------------')
-        print('[size=' + str(os.path.getsize(file)) + ' ' + file + ']')
-        print('[size=' + str(os.path.getsize(ref_file)) + ' ' + ref_file + ']')
-        print('  /:open')
+        print('[size=' + str(os.path.getsize(file1)) + ' ' + file1 + ']')
+        print('[size=' + str(os.path.getsize(file2)) + ' ' + file2 + ']')
+        print('  l:delete ' + file1)
+        print('  ;:open   ' + file1)
+        print('  .:delete ' + file2)
+        print('  /:open   ' + file2)
         print('  \':skip')
-        print('  k:delete [size=' +
-              str(os.path.getsize(file)) + ' ' + file + ']')
-        print(
-            '  l:delete [size=' + str(os.path.getsize(ref_file)) + ' ' + ref_file + ']')
         print('  q:quit')
         while True:
             key = getch()
-            if(key == '/'):
-                print('play movies')
-                subprocess.call(
-                    ["open", "/Applications/VLC.app", ref_file, file])
-            elif(key == '\''):
-                print('skip')
-                break
-            elif(key == 'k'):
+            if(key == 'l'):
+                file = file1
                 print('delete ' + file)
                 send2trash(file)
                 deleted_files.append(os.path.basename(file))
                 break
-            elif(key == 'l'):
-                print('delete ' + ref_file)
-                send2trash(ref_file)
-                deleted_files.append(os.path.basename(ref_file))
+            elif(key == '.'):
+                file = file2
+                print('delete ' + file)
+                send2trash(file)
+                deleted_files.append(os.path.basename(file))
+                break
+            elif(key == ';'):
+                file = file1
+                print('play ' + file)
+                subprocess.call(["open", "/Applications/VLC.app", file])
+            elif(key == '/'):
+                file = file2
+                print('play ' + file)
+                subprocess.call(["open", "/Applications/VLC.app", file])
+            elif(key == '\''):
+                print('skip')
                 break
             elif(key == 'q'):
                 exit()
