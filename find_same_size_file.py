@@ -47,14 +47,18 @@ for file in sorted_files:
         while True:
             key = getch()
             if(key == '/'):
+                print('play movies')
                 subprocess.call(
                     ["open", "/Applications/VLC.app", file, pre_file])
             elif(key == '\''):
+                print('skip')
                 break
             elif(key == 'k'):
+                print('delete ' + pre_file)
                 send2trash(pre_file)
                 break
             elif(key == 'l'):
+                print('delete ' + file)
                 send2trash(file)
                 break
             elif(key == 'q'):
