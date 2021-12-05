@@ -3,6 +3,7 @@ import csv
 import glob
 import os
 import pathlib
+import platform
 import psutil
 import random
 import shutil
@@ -159,9 +160,14 @@ class MoviePlayerMachine(object):
         self._num_files = len(self._play_list)
 
     def play_movie(self):
-        subprocess.call(["nice", "-n", "10", "open",
-                         "/Applications/VLC.app",
-                         self._file])
+        if platform.system()=='Darwin':
+            subprocess.call(["nice", "-n", "10", "open",
+                             "/Applications/VLC.app",
+                             self._file])
+        elif platform.system()=='Linux':
+            subprocess.call(["vlc", self._file])
+        else:
+            print('This script is only for mac or linux')
         self._history_manager.played(self._file)
 
     def delete_movie(self):
